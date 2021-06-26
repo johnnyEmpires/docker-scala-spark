@@ -1,0 +1,8 @@
+echo 'WELCOME TO ALPINE SCALA-SPARK CONTAINER'
+
+# custom exports
+export SPARK_HOME=/root/spark
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+alias ls="ls -la"
+alias vi='vi -c "set tabstop=4"'
