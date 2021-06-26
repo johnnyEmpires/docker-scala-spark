@@ -1,5 +1,7 @@
 FROM openjdk:8u151-jre-alpine
 
+WORKDIR /root
+
 ENV SCALA_VERSION=2.12.4 \
     SCALA_HOME=/usr/share/scala \
     ENV=/root/.ashrc \
@@ -19,19 +21,24 @@ RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
     apk del .build-dependencies && \
     rm -rf "/tmp/"*
 
+
 # update wget
 RUN apk add --no-cache wget
 RUN wget --no-verbose https://ftp.tsukuba.wide.ad.jp/software/apache/spark/${SPARK_VER}/${SPARK_VER}-bin-${HADOOP_VER}.tgz \
-   -P /root/SPARK_INSTALLER
+   -P /root
 
 RUN mkdir /root/spark && \
-    cd /root && \
-    tar -xzf /root/SPARK_INSTALLER/${SPARK_VER}-bin-${HADOOP_VER}.tgz && \
-    mv /root/${SPARK_VER}-bin-${HADOOP_VER}/* /root/spark
+   cd /root && \
+   tar -xzf /root/${SPARK_VER}-bin-${HADOOP_VER}.tgz && \
+   mv /root/${SPARK_VER}-bin-${HADOOP_VER}/* /root/spark && \
+   rm -rf /root/${SPARK_VER}-bin-${HADOOP_VER}.tgz && \
+   rm -rf /root/${SPARK_VER}-bin-${HADOOP_VER}
+
+# workaround: spark nohup error
+RUN apk --update add coreutils
 
 ADD .ashrc /root
 
 # convert windows formatted file to unix-like
 RUN dos2unix /root/.ashrc
 
-WORKDIR /root
